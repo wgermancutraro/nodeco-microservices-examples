@@ -1,0 +1,105 @@
+version : '3'
+
+services:
+    cosasapp:
+        container_name: cosasapp
+        restart: always
+        build: 
+            context: ./cosas/
+            dockerfile: Dockerfile
+        external_links:
+            - mongo  
+        environment:
+            - APPID=1111
+            - MONGO_HOST=mongocosas   
+            - MONGO_DB=cosasdb   
+            - MONGO_PORT=27017         
+            - NATS_HOST=nats-streaming-1         
+            - NATS_PORT=4222         
+    buscadorapp:
+        container_name: buscadorapp
+        restart: always
+        build:
+            context: ./buscador/
+            dockerfile: Dockerfile 
+        environment:
+            - APPID=3333
+            - MONGO_HOST=mongobuscador   
+            - MONGO_DB=buscadordb   
+            - MONGO_PORT=27017   
+            - NATS_HOST=nats-streaming-1         
+            - NATS_PORT=4222
+    buscadorapp2:
+        container_name: buscadorapp2
+        restart: always
+        build:
+            context: ./buscador/
+            dockerfile: Dockerfile 
+        environment:
+            - APPID=4444
+            - MONGO_HOST=mongobuscador2 
+            - MONGO_DB=buscador2db   
+            - MONGO_PORT=27017   
+            - NATS_HOST=nats-streaming-1         
+            - NATS_PORT=4222        
+    mongocosas:
+        container_name: mongocosas
+        image: mongo
+        environment:
+            MONGO_INITDB_DATABASE: cosasdb
+        ports:
+            - '27017:27017'    
+        volumes:
+            - mongo-cosas-vl:/data:/data/db  
+        command: mongod --quiet --logpath /dev/null 
+    mongobuscador:
+        container_name: mongobuscador
+        image: mongo
+        environment:
+            MONGO_INITDB_DATABASE: buscadordb
+        ports:
+            - '27018:27017'    
+        volumes:
+            - mongo-buscador-vl:/data:/data/db    
+        command: mongod --quiet --logpath /dev/null 
+    mongobuscador2:
+        container_name: mongobuscador2
+        image: mongo
+        environment:
+            MONGO_INITDB_DATABASE: buscador2db
+        ports:
+            - '27019:27017'    
+        volumes:
+            - mongo-buscador2-vl:/data:/data/db    
+        command: mongod --quiet --logpath /dev/null     
+    lb:
+        image: haproxy
+        ports:
+            - "80:80"
+        volumes:
+            - ./haproxy:/usr/local/etc/haproxy        
+    nats-streaming-1:
+        command:
+            - "-p"
+            - "4222"
+            - "-m"
+            - '8222'
+            - "-hbi"
+            - "5s"
+            - "-hbt"
+            - "5s"
+            - "-hbf"
+            - '2'
+            - "-SD"
+            - "-cid"
+            - "nats_example"
+        image: "nats-streaming:0.17.0"
+        ports:
+            - "4222:4222"
+        volumes:
+            - "./nats-streaming-1:/data"
+
+volumes:
+    mongo-cosas-vl:
+    mongo-buscador-vl:
+    mongo-buscador2-vl:

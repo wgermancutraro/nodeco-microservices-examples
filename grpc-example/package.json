@@ -1,0 +1,21 @@
+{
+  "name": "grpc-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.0.0",
+    "@grpc/proto-loader": "^0.5.3",
+    "grpc": "^1.24.9",
+    "mongoose": "^6.2.1"
+  },
+  "devDependencies": {
+    "uuid": "^8.3.2"
+  }
+}
